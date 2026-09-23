@@ -151,9 +151,8 @@ s popiskou *chýba odkaz*.
 
 ## Otváracie hodiny
 
-V `data/bruto.json` sú hodiny zámerne **vypnuté** (`hours.enabled: false`) —
-verejne sa nenašli overené otváracie hodiny kancelárie ani showroomu.
-Doplňte ich v administrácii, keď ich firma potvrdí, a hodiny zapnite.
+V `data/bruto.json` sú hodiny nastavené Po–Pia 8:00–15:30, So/Ne zatvorené
+(potvrdené firmou, [zvazsito.sk/kontakt](https://zvazsito.sk/kontakt/)).
 
 ---
 
@@ -173,13 +172,14 @@ a pozadím musí byť výrazný.
 
 Obsah `data/bruto.json` bol zostavený z verejne dostupných stránok:
 
-- [bruto.sk](https://bruto.sk/) — adresa, telefón, e-mail kancelárie
-- [zvazsito.sk/znacka/brutto-s-r-o](https://zvazsito.sk/znacka/brutto-s-r-o/) — e-shop, popis firmy
-- [facebook.com/digitalne.vahy](https://www.facebook.com/digitalne.vahy) (stránka „ZvážSiTo") — adresa showroomu, telefón, e-mail
+- [bruto.sk](https://bruto.sk/) — popis firmy, história
+- [zvazsito.sk/znacka/brutto-s-r-o](https://zvazsito.sk/znacka/brutto-s-r-o/) — e-shop
+- [zvazsito.sk/kontakt](https://zvazsito.sk/kontakt/) — adresa predajne (Niklova ul. 4434, Sereď), telefón, e-mail, otváracie hodiny
+- [facebook.com/digitalne.vahy](https://www.facebook.com/digitalne.vahy) (stránka „ZvážSiTo") — sociálne siete
 - [digitalne-vahy.sk](https://www.digitalne-vahy.sk/) — ďalší obchod firmy
 - [avs.bruto.sk](https://avs.bruto.sk/) — automatizované vážiace systémy
 
-Otváracie hodiny sa verejne overiť nedali — treba doplniť ručne.
+Otváracie hodiny (Po–Pia 8:00–15:30) potvrdila firma priamo.
 
 ---
 

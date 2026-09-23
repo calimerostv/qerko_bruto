@@ -1,7 +1,7 @@
 {
   "slug": "bruto",
   "name": "Bruto s.r.o.",
-  "subtitle": "Trnavská cesta 913, Sereď",
+  "subtitle": "Niklova ul. 4434, Sereď",
   "mark": {
     "type": "text",
     "text": "BR",
@@ -15,16 +15,16 @@
     "deep": ""
   },
   "hours": {
-    "enabled": false,
+    "enabled": true,
     "tz": "Europe/Bratislava",
-    "note": "Otváracie hodiny treba doplniť — nenašli sa verejne overené.",
+    "note": "Telefonicky aj e-mailom sme k dispozícii v týchto hodinách.",
     "days": [
+      { "closed": false, "ranges": [["08:00", "15:30"]] },
+      { "closed": false, "ranges": [["08:00", "15:30"]] },
+      { "closed": false, "ranges": [["08:00", "15:30"]] },
+      { "closed": false, "ranges": [["08:00", "15:30"]] },
+      { "closed": false, "ranges": [["08:00", "15:30"]] },
       { "closed": true, "ranges": [] },
-      { "closed": false, "ranges": [["8:00", "16:00"]] },
-      { "closed": false, "ranges": [["8:00", "16:00"]] },
-      { "closed": false, "ranges": [["8:00", "16:00"]] },
-      { "closed": false, "ranges": [["8:00", "16:00"]] },
-      { "closed": false, "ranges": [["8:00", "16:00"]] },
       { "closed": true, "ranges": [] }
     ]
   },
@@ -103,22 +103,22 @@
         {
           "type": "navigate",
           "title": "Navigovať",
-          "note": "Trnavská cesta 913, Sereď",
+          "note": "Niklova ul. 4434, Sereď",
           "value": "",
           "icon": "navigation",
           "hidden": false
         },
         {
           "type": "phone",
-          "title": "Zavolať — kancelária",
-          "note": "031 789 28 30",
-          "value": "",
+          "title": "Zavolať",
+          "note": "031 20 28 965",
+          "value": "+421312028965",
           "icon": "phone",
           "hidden": false
         },
         {
           "type": "phone",
-          "title": "Zavolať — ZvážSiTo",
+          "title": "Zavolať — mobil",
           "note": "0917 862 299",
           "value": "+421917862299",
           "icon": "phone",
@@ -136,10 +136,10 @@
     }
   ],
   "contact": {
-    "phone": "+421317892830",
+    "phone": "+421312028965",
     "email": "milos@bruto.sk",
     "web": "https://bruto.sk",
-    "address": "Trnavská cesta 913, 926 01 Sereď",
+    "address": "Niklova ul. 4434, 926 01 Sereď",
     "org": "Bruto s.r.o. — výrobca váh a vážiacich systémov"
   },
   "footer": {
