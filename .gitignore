@@ -1,0 +1,24 @@
+# Heslo administrácie pre PHP hosting — nikdy do repozitára.
+api/config.php
+api/dbconfig.php
+api/mailconfig.php
+
+# Ikony pre manifest.php — generuje ich za behu prehliadač cez
+# api/iconcache.php, živý obsah na serveri, nepatrí do repa.
+assets/icons/
+
+# Pracovné a systémové
+.tmp/
+*.tmp
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Podklady k návrhu (uložená stránka artifactu)
+Ťapka.html
+Ťapka_files/
+
+# Editory
+.vscode/
+.idea/
+.claude/scheduled_tasks.lock

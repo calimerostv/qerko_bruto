@@ -1,0 +1,556 @@
+<!doctype html>
+<html lang="sk" data-admin-theme="">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Administrácia rozcestníkov</title>
+<meta name="robots" content="noindex,nofollow">
+<meta name="color-scheme" content="light dark">
+<!-- style-src potrebuje 'unsafe-inline' kvôli inline style="" atribútom v tejto
+     stránke; connect-src https: kvôli kontrole odkazov (ktorákoľvek adresa, ktorú
+     správca do prevádzky zadá) a GitHub API adaptéru ukladania. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https:; manifest-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="icon" href="../assets/img/favicon.svg?v=20260923a" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../assets/css/site.css?v=20260923a">
+<link rel="stylesheet" href="../assets/css/admin.css?v=20260923a">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="logo"><span class="badge">QR</span> <span id="brandName">Administrácia</span></div>
+  <div class="grow"></div>
+  <select id="venuePicker" style="max-width:230px" aria-label="Vybrať qerko"></select>
+  <button class="btn ghost sm" id="btnNew" type="button">Nové qerko</button>
+  <button class="btn ghost sm" id="btnImport" type="button">Načítať JSON</button>
+  <button class="btn ghost sm" id="btnExport" type="button">Uložiť JSON</button>
+  <input type="file" id="fileImport" accept="application/json,.json" hidden>
+</header>
+
+<div class="shell">
+
+  <!-- ================= EDITOR ================= -->
+  <main class="main">
+
+    <details class="card" open>
+      <summary><span class="n">1</span> Základné údaje</summary>
+      <div class="card-body">
+        <div class="field">
+          <span class="lbl">Typ stránky</span>
+          <div class="row" style="gap:8px">
+            <label class="check fixed"><input type="radio" name="kind" value="venue" checked> Stála prevádzka</label>
+            <label class="check fixed"><input type="radio" name="kind" value="event"> Podujatie</label>
+          </div>
+          <p class="hint">Podujatie má dátum a program namiesto otváracích hodín. QR kód sa
+            vytlačí raz, každý rok len prepíšeš dátumy — po skončení ukáže „Skončilo".</p>
+        </div>
+
+        <div class="row">
+          <div class="field" style="flex:2">
+            <label for="fName" id="fNameLabel">Názov prevádzky</label>
+            <input type="text" id="fName" placeholder="Kino Nova">
+          </div>
+          <div class="field">
+            <label for="fSlug">Adresa (slug)</label>
+            <input type="text" id="fSlug" placeholder="kinonova" spellcheck="false">
+          </div>
+        </div>
+        <p class="hint">Výsledná adresa: <code id="slugPreview">—</code></p>
+
+        <div class="field">
+          <span class="lbl">Ďalšie jazyky (nepovinné)</span>
+          <div class="row" id="langToggles" style="flex-wrap:wrap;gap:6px"></div>
+          <p class="hint">Pri zapnutí pribudne dole karta Preklady a na verejnej stránke
+            prepínač jazyka. Bez prekladu konkrétneho textu sa jednoducho zobrazí
+            slovenský originál.</p>
+        </div>
+
+        <div class="field">
+          <label for="fSubtitle">Podnadpis pod názvom</label>
+          <input type="text" id="fSubtitle" placeholder="Námestie republiky 12, Sereď">
+        </div>
+
+        <div class="field">
+          <span class="lbl">Značka v hlavičke</span>
+          <div class="row" style="align-items:center">
+            <div class="logo-prev fixed" id="markPreview"></div>
+            <div style="flex:1">
+              <div class="row">
+                <label class="check fixed"><input type="radio" name="markType" value="text" checked> Iniciály</label>
+                <label class="check fixed"><input type="radio" name="markType" value="image"> Logo</label>
+              </div>
+              <div id="markTextWrap" style="margin-top:8px">
+                <input type="text" id="fMarkText" maxlength="3" placeholder="KN">
+              </div>
+              <div id="markImageWrap" style="margin-top:8px;display:none">
+                <div class="row">
+                  <button class="btn sm fixed" type="button" id="btnLogo">Vybrať obrázok</button>
+                  <button class="btn sm danger fixed" type="button" id="btnLogoClear">Odstrániť</button>
+                </div>
+                <input type="file" id="fileLogo" accept="image/png,image/jpeg,image/svg+xml,image/webp" hidden>
+                <p class="hint">PNG, SVG alebo JPG. Obrázok sa zmenší a uloží priamo do JSON súboru,
+                  takže netreba riešiť ďalší hosting. Ideál je štvorec s priehľadným pozadím.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <details class="card" open>
+      <summary><span class="n">2</span> Vzhľad</summary>
+      <div class="card-body">
+        <div class="field">
+          <span class="lbl">Farebná téma</span>
+          <div class="themes" id="themeGrid"></div>
+        </div>
+
+        <div class="row" style="margin-top:14px">
+          <div class="field">
+            <label for="fMode">Svetlý alebo tmavý režim</label>
+            <select id="fMode">
+              <option value="auto">Podľa nastavenia telefónu</option>
+              <option value="light">Vždy svetlý</option>
+              <option value="dark">Vždy tmavý</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="fFont">Písmo</label>
+            <select id="fFont"></select>
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="lbl">Vlastné farby (nepovinné — prebijú tému)</span>
+          <div class="row">
+            <div class="fixed">
+              <label class="lbl" for="fAccent">Akcent</label>
+              <div class="row">
+                <input type="color" id="fAccent" class="fixed">
+                <button class="btn sm fixed" type="button" data-clear="accent">Zrušiť</button>
+              </div>
+            </div>
+            <div class="fixed">
+              <label class="lbl" for="fDeep">Hlavička</label>
+              <div class="row">
+                <input type="color" id="fDeep" class="fixed">
+                <button class="btn sm fixed" type="button" data-clear="deep">Zrušiť</button>
+              </div>
+            </div>
+          </div>
+          <p class="hint">Farba textu na týchto plochách sa dopočíta sama, aby zostal čitateľný.</p>
+        </div>
+
+        <div class="field">
+          <span class="lbl">Fotka na pozadí hlavičky</span>
+          <div class="row" style="align-items:center">
+            <div class="logo-prev fixed" id="heroPreview" style="width:104px;height:58px"></div>
+            <div style="flex:1">
+              <div class="row">
+                <button class="btn sm fixed" type="button" id="btnHero">Vybrať fotku</button>
+                <button class="btn sm danger fixed" type="button" id="btnHeroClear">Odstrániť</button>
+              </div>
+              <p class="hint">Na šírku, ideálne záber prevádzky. Zmenší sa na 1200 px
+                a uloží do JSON súboru.</p>
+            </div>
+          </div>
+          <input type="file" id="fileHero" accept="image/png,image/jpeg,image/webp" hidden>
+
+          <div class="field" id="heroDimWrap" style="display:none">
+            <label for="fHeroDim">Krytie farebnej vrstvy — <span id="heroDimVal">55</span> %</label>
+            <input type="range" id="fHeroDim" min="0" max="95" step="5" value="55" style="width:100%">
+            <p class="hint">Čím vyššie, tým viac presvitá farba témy a tým je text čitateľnejší.
+              Pod 30 % býva nadpis na svetlej fotke ťažko čitateľný.</p>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <details class="card" open>
+      <summary><span class="n">3</span> Hlavná výzva</summary>
+      <div class="card-body">
+        <label class="check" style="margin-top:12px">
+          <input type="checkbox" id="fPrimaryOn"> Zobraziť veľké tlačidlo nad ostatnými odkazmi
+        </label>
+        <div id="primaryFields" style="display:none">
+          <div class="row">
+            <div class="field">
+              <label for="fPrimaryType">Typ</label>
+              <select id="fPrimaryType"></select>
+            </div>
+            <div class="field">
+              <label for="fPrimaryTitle">Nadpis</label>
+              <input type="text" id="fPrimaryTitle" placeholder="Napísať recenziu">
+            </div>
+          </div>
+          <div class="field">
+            <label for="fPrimaryNote">Popis pod nadpisom</label>
+            <input type="text" id="fPrimaryNote" placeholder="Google · trvá to 20 sekúnd">
+          </div>
+          <div class="field">
+            <label for="fPrimaryUrl">Odkaz</label>
+            <input type="url" id="fPrimaryUrl" placeholder="https://g.page/r/…/review" spellcheck="false">
+            <p class="hint" id="primaryHint"></p>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <details class="card" open>
+      <summary><span class="n">4</span> Odkazy a dlaždice</summary>
+      <div class="card-body">
+        <div id="sections"></div>
+        <div class="btnrow">
+          <button class="btn" type="button" id="btnAddSection">Pridať sekciu</button>
+        </div>
+      </div>
+    </details>
+
+    <details class="card" id="translationsCard" hidden>
+      <summary><span class="n">5</span> Preklady</summary>
+      <div class="card-body">
+        <p class="hint" style="margin-top:12px">Chýbajúci preklad sa jednoducho nezobrazí —
+          na verejnej stránke sa v tom jazyku ukáže slovenský originál.</p>
+        <div id="translationsBody"></div>
+      </div>
+    </details>
+
+    <details class="card" id="eventCard" hidden>
+      <summary><span class="n">6</span> Podujatie</summary>
+      <div class="card-body">
+        <div class="row">
+          <div class="field">
+            <label for="fEventFrom">Od (dátum)</label>
+            <input type="date" id="fEventFrom">
+          </div>
+          <div class="field">
+            <label for="fEventTo">Do (dátum)</label>
+            <input type="date" id="fEventTo">
+          </div>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label for="fEventFromTime">Čas od</label>
+            <input type="time" id="fEventFromTime">
+          </div>
+          <div class="field">
+            <label for="fEventToTime">Čas do</label>
+            <input type="time" id="fEventToTime">
+          </div>
+        </div>
+        <div class="field">
+          <label for="fEventPlace">Miesto konania</label>
+          <input type="text" id="fEventPlace" placeholder="Námestie slobody, Sereď">
+        </div>
+        <div class="field">
+          <label for="fEventAfter">Text po skončení</label>
+          <input type="text" id="fEventAfter" placeholder="Ďakujeme! Ďalší ročník december 2027.">
+          <p class="hint">Zobrazí sa v hlavičke, keď je podujatie po dátume.</p>
+        </div>
+
+        <div class="field">
+          <span class="lbl">Program</span>
+          <div id="programList"></div>
+          <div class="btnrow"><button class="btn sm" type="button" id="btnAddProgram">Pridať bod programu</button></div>
+        </div>
+      </div>
+    </details>
+
+    <details class="card" id="hoursCard">
+      <summary><span class="n">6</span> Otváracie hodiny</summary>
+      <div class="card-body">
+        <label class="check" style="margin-top:12px">
+          <input type="checkbox" id="fHoursOn"> Zobrazovať otváracie hodiny a stav „Otvorené / Zatvorené“
+        </label>
+        <div id="hoursFields">
+          <div class="hgrid" id="hoursGrid"></div>
+          <div class="btnrow">
+            <button class="btn sm" type="button" id="btnHoursCopy">Skopírovať pondelok na všetky dni</button>
+          </div>
+          <div class="field">
+            <label for="fHoursNote">Poznámka pod hodinami</label>
+            <input type="text" id="fHoursNote" placeholder="Cez štátne sviatky zatvorené">
+          </div>
+
+          <div class="field">
+            <span class="lbl">Sezóny (napr. iné hodiny cez leto)</span>
+            <p class="hint">Kontrolujú sa v poradí, prvá zhoda vyhráva. Mimo zadaného obdobia
+              platí bežný rozvrh vyššie.</p>
+            <div id="seasonsList"></div>
+            <div class="btnrow"><button class="btn sm" type="button" id="btnAddSeason">Pridať sezónu</button></div>
+          </div>
+
+          <div class="field">
+            <span class="lbl">Výnimky (sviatok, jednorazová zmena)</span>
+            <p class="hint">Presný dátum má prednosť pred sezónou aj bežným rozvrhom.</p>
+            <div id="exceptionsList"></div>
+            <div class="btnrow"><button class="btn sm" type="button" id="btnAddException">Pridať výnimku</button></div>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="n">7</span> Kontaktné údaje</summary>
+      <div class="card-body">
+        <p class="hint" style="margin-top:12px">Z týchto polí sa skladá dlaždica „Uložiť kontakt“ (vCard)
+          a dopĺňajú sa nimi dlaždice Zavolať, E-mail a Navigovať, ak v nich necháte odkaz prázdny.</p>
+        <div class="row">
+          <div class="field"><label for="cPhone">Telefón</label><input type="tel" id="cPhone" placeholder="+421 903 000 000"></div>
+          <div class="field"><label for="cEmail">E-mail</label><input type="email" id="cEmail" placeholder="info@example.sk"></div>
+        </div>
+        <div class="row">
+          <div class="field"><label for="cWeb">Web</label><input type="url" id="cWeb" placeholder="https://example.sk"></div>
+          <div class="field"><label for="cOrg">Organizácia</label><input type="text" id="cOrg" placeholder="Dom kultúry Sereď"></div>
+        </div>
+        <div class="field"><label for="cAddress">Adresa</label><input type="text" id="cAddress" placeholder="Námestie republiky 12, 926 01 Sereď"></div>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary><span class="n">8</span> Päta a popis pre vyhľadávače</summary>
+      <div class="card-body">
+        <div class="field"><label for="fFootText">Text v päte</label><input type="text" id="fFootText" placeholder="Prevádzkuje Dom kultúry Sereď"></div>
+        <label class="check" style="margin-top:12px"><input type="checkbox" id="fFootBrand"> Zobraziť názov systému v päte</label>
+        <div class="field">
+          <label for="fSeo">Popis stránky (meta description)</label>
+          <textarea id="fSeo" rows="2" placeholder="Kino Nova v Seredi — program, vstupenky a kontakt."></textarea>
+        </div>
+      </div>
+    </details>
+
+  </main>
+
+  <!-- ================= BOČNÝ PANEL ================= -->
+  <aside class="side">
+
+    <div class="pv-tabs">
+      <button type="button" class="is-on" data-pv="preview">Náhľad</button>
+      <button type="button" data-pv="qr">QR kód</button>
+      <button type="button" data-pv="stats">Štatistiky</button>
+      <button type="button" data-pv="save">Uloženie</button>
+    </div>
+
+    <!-- Náhľad -->
+    <section data-pane="preview">
+      <div class="phone">
+        <div class="urlbar" id="pvUrl"></div>
+        <div class="preview-scroll">
+          <div id="preview" class="venue"></div>
+        </div>
+      </div>
+      <p class="hint" style="text-align:center">Náhľad kreslí ten istý kód ako verejná stránka.<br>Navyše ukazuje aj dlaždice bez odkazu — tie sa navonok nezobrazia.</p>
+    </section>
+
+    <!-- QR -->
+    <section data-pane="qr" hidden>
+      <div class="card" style="margin:0">
+        <div class="card-head">QR kód na stiahnutie</div>
+        <div class="card-body">
+          <div class="field">
+            <label for="qBase">Základná adresa</label>
+            <input type="url" id="qBase" placeholder="https://qr.bruto.sk" spellcheck="false">
+            <p class="hint">Doména, na ktorej stránka pobeží. Uloží sa do tohto prehliadača,
+              takže sa nezadáva pri každej prevádzke.</p>
+          </div>
+          <div class="qrbox" id="qrBox"></div>
+          <p class="qr-url" id="qrUrl"></p>
+
+          <div class="row" style="margin-top:12px">
+            <div class="fixed">
+              <label class="lbl" for="qDark">Farba kódu</label>
+              <input type="color" id="qDark" value="#0E3B36">
+            </div>
+            <div class="fixed">
+              <label class="lbl" for="qLight">Pozadie</label>
+              <input type="color" id="qLight" value="#FFFFFF">
+            </div>
+            <div style="flex:1">
+              <label class="check" style="margin-bottom:6px"><input type="checkbox" id="qLogo"> Logo v strede</label>
+              <label class="check"><input type="checkbox" id="qTransparent"> Priehľadné pozadie (len SVG)</label>
+            </div>
+          </div>
+          <p class="hint" id="qWarn"></p>
+
+          <div class="btnrow">
+            <button class="btn accent" type="button" id="btnQrSvg">SVG do tlače</button>
+            <button class="btn" type="button" id="btnQrPng">PNG 1024</button>
+            <button class="btn" type="button" id="btnQrPng2">PNG 2048</button>
+          </div>
+          <p class="hint">SVG je vektor — nerozmaže sa ani na plagáte. PNG použite na web a sociálne siete.</p>
+
+          <div class="field">
+            <label for="qFormat">Formát tlačového hárku</label>
+            <select id="qFormat"></select>
+          </div>
+          <div class="btnrow">
+            <button class="btn" type="button" id="btnQrPrint">Vytlačiť túto prevádzku</button>
+            <button class="btn" type="button" id="btnQrPrintAll">Vytlačiť všetky prevádzky</button>
+          </div>
+          <p class="hint">Hromadná tlač vytvorí jeden dokument so všetkými uloženými prevádzkami,
+            po jednej stránke na každú — namiesto sťahovania jednotlivo.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Štatistiky -->
+    <section data-pane="stats" hidden>
+      <div class="card" style="margin:0">
+        <div class="card-head">Návštevy a kliky</div>
+        <div class="card-body">
+          <p class="hint" style="margin-top:12px">Anonymné denné súčty — koľko ľudí stránku
+            otvorilo a koľko prekliklo na jednotlivé dlaždice. Žiadne IP adresy ani iné osobné
+            údaje. Vyžaduje databázu a heslo alebo prihlásenie.</p>
+          <div class="btnrow">
+            <button class="btn" type="button" id="btnStatsLoad">Načítať posledných 30 dní</button>
+          </div>
+          <div id="statsResults"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">Poslať report e-mailom</div>
+        <div class="card-body">
+          <p class="hint" style="margin-top:12px">Jednorazové odoslanie štatistík tejto
+            prevádzky za zvolené obdobie na zadaný e-mail (namiesto/popri automatickom
+            týždennom a mesačnom reporte).</p>
+          <div class="exception-fields">
+            <input type="date" id="reportFrom" title="Od">
+            <span>–</span>
+            <input type="date" id="reportTo" title="Do">
+            <input type="email" id="reportEmail" placeholder="komu@example.sk" style="flex:1;min-width:220px">
+          </div>
+          <div class="btnrow">
+            <button class="btn" type="button" id="btnReportSend">Odoslať report</button>
+          </div>
+          <div id="reportNote"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Uloženie -->
+    <section data-pane="save" hidden>
+      <div class="card" style="margin:0">
+        <div class="card-head">Uloženie zmien</div>
+        <div class="card-body">
+          <div class="field">
+            <label for="sAdapter">Spôsob uloženia</label>
+            <select id="sAdapter"></select>
+            <p class="hint" id="sHint"></p>
+          </div>
+          <div class="field" id="secretWrap" style="display:none">
+            <label for="sSecret" id="sSecretLabel">Heslo</label>
+            <input type="password" id="sSecret" autocomplete="current-password">
+            <label class="check" style="margin-top:8px">
+              <input type="checkbox" id="sRemember"> Zapamätať v tomto prehliadači
+            </label>
+          </div>
+          <div class="btnrow">
+            <button class="btn primary" type="button" id="btnSave">Uložiť prevádzku</button>
+            <button class="btn" type="button" id="btnTest">Overiť spojenie</button>
+          </div>
+          <div id="saveNote"></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:14px">
+        <div class="card-head">Kontrola odkazov</div>
+        <div class="card-body">
+          <p class="hint" style="margin-top:12px">Overí, či odkazy tejto prevádzky niekam vedú.
+            Na PHP hostingu ide o skutočný HTTP dotaz; bez neho (napr. na Verceli)
+            len o obmedzenú kontrolu z prehliadača.</p>
+          <div class="btnrow">
+            <button class="btn" type="button" id="btnCheckLinks">Skontrolovať odkazy</button>
+          </div>
+          <div id="linkCheckResults"></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:14px">
+        <div class="card-head">Prihlásenie (voliteľné)</div>
+        <div class="card-body">
+          <p class="hint" style="margin-top:12px">Nepovinné — bez neho funguje ukladanie presne
+            ako doteraz cez heslo vyššie. Prihlásenie navyše umožní, aby si každú prevádzku
+            spravoval niekto iný so svojím vlastným heslom (potrebná databáza, viď
+            <code>api/dbconfig.example.php</code>).</p>
+          <div class="row">
+            <div class="field">
+              <label for="loginSlug">Prevádzka (prázdne = master heslo)</label>
+              <input type="text" id="loginSlug" placeholder="kinonova" spellcheck="false">
+            </div>
+            <div class="field">
+              <label for="loginPassword">Heslo</label>
+              <input type="password" id="loginPassword" autocomplete="current-password">
+            </div>
+          </div>
+          <label class="check" style="margin-top:8px">
+            <input type="checkbox" id="loginRemember" checked> Zapamätať na tomto zariadení (14 dní)
+          </label>
+          <div class="btnrow">
+            <button class="btn primary" type="button" id="btnLogin">Prihlásiť sa</button>
+            <button class="btn" type="button" id="btnLogout" style="display:none">Odhlásiť sa</button>
+          </div>
+          <div id="loginNote"></div>
+          <div id="loginStatus" class="pill" style="margin-top:10px;display:none"></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:14px" id="accountsCard" hidden>
+        <div class="card-head">Účty prevádzok</div>
+        <div class="card-body">
+          <p class="hint" style="margin-top:12px">Len prihlásený master heslom. Prevádzka sa
+            prihlási vyššie svojím slugom a týmto heslom — uvidí a smie upravovať len seba.</p>
+          <div id="accountsList"></div>
+          <div class="row" style="margin-top:10px">
+            <div class="field">
+              <label for="acctSlug">Slug</label>
+              <input type="text" id="acctSlug" placeholder="kinonova" spellcheck="false">
+            </div>
+            <div class="field">
+              <label for="acctPassword">Nové heslo</label>
+              <input type="password" id="acctPassword" autocomplete="new-password">
+            </div>
+          </div>
+          <div class="btnrow">
+            <button class="btn" type="button" id="btnAcctSet">Nastaviť heslo</button>
+          </div>
+          <div id="acctNote"></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:14px">
+        <div class="card-head">Nebezpečná zóna</div>
+        <div class="card-body">
+          <p class="hint" style="margin-top:12px">Zneviditeľnenie skryje toto qerko z verejného
+            rozcestníka na koreni domény. Priama adresa aj QR kód fungujú ďalej a kedykoľvek to
+            vrátiš späť.</p>
+          <div class="btnrow">
+            <button class="btn" type="button" id="btnHideToggle">Zneviditeľniť moje qerko</button>
+          </div>
+          <p class="hint" id="deleteHint" style="margin-top:18px">Odstránenie vymaže qerko zo
+            zoznamu úplne. Samotný JSON súbor zostane na disku — zmažte ho ručne, ak ho už
+            netreba. Môže to len master.</p>
+          <div class="btnrow" id="deleteRow">
+            <button class="btn danger" type="button" id="btnDelete">Odstrániť zo zoznamu</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </aside>
+</div>
+
+<script src="../assets/js/swupdate.js?v=20260923a"></script>
+<script src="../assets/js/config.js?v=20260923a"></script>
+<script src="../assets/js/admin-paths.js?v=20260923a"></script>
+<script src="../assets/js/icons.js?v=20260923a"></script>
+<script src="../assets/js/schema.js?v=20260923a"></script>
+<script src="../assets/js/render.js?v=20260923a"></script>
+<script src="../assets/js/qrcode.js?v=20260923a"></script>
+<script src="../assets/js/qr.js?v=20260923a"></script>
+<script src="../assets/js/storage.js?v=20260923a"></script>
+<script src="../assets/js/admin.js?v=20260923a"></script>
+</body>
+</html>

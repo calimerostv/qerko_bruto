@@ -1,0 +1,89 @@
+# ------------------------------------------------------------------
+# Apache — klasický doménový hosting.
+# Na Verceli sa tento súbor ignoruje, tam platí vercel.json.
+# ------------------------------------------------------------------
+
+Options -Indexes
+DirectoryIndex index.html
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # PHP cez CGI/FastCGI (bežné na zdieľanom hostingu) hlavičku
+  # Authorization bez tohto zahodí — api/integration.php (Bearer token
+  # pre Déčko) by inak vždy videl "chýba hlavička" (ANALYSIS.md #5).
+  # Musí byť pred pravidlom pre existujúce súbory nižšie, inak sa toto
+  # pravidlo pre priamy prístup na /api/integration.php nikdy nespustí.
+  RewriteCond %{HTTP:Authorization} ^(.+)$
+  RewriteRule .* - [E=HTTP_AUTHORIZATION:%1]
+
+  # Skutočné súbory a priečinky (assets, data, admin, api) idú priamo.
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # Roboty sociálnych sietí (náhľad pri zdieľaní) dostanú meta tagy
+  # z og.php namiesto prázdneho SPA shellu — JavaScript nespúšťajú,
+  # takže by inak videli len "Rozcestník" bez mena prevádzky.
+  #
+  # Ak je pred hostingom nginx s vlastným SPA fallbackom, tieto pravidlá
+  # sa nemusia spustiť — treba overiť po nasadení (curl -A
+  # facebookexternalhit https://qr.bruto.sk/ má vrátiť meta z og.php).
+  RewriteCond %{HTTP_USER_AGENT} (facebookexternalhit|Twitterbot|Slackbot|WhatsApp|TelegramBot|LinkedInBot|Discordbot|Pinterest|redditbot|Applebot|SkypeUriPreview|vkShare) [NC]
+  RewriteRule ^$ og.php [L,QSA]
+
+  RewriteCond %{HTTP_USER_AGENT} (facebookexternalhit|Twitterbot|Slackbot|WhatsApp|TelegramBot|LinkedInBot|Discordbot|Pinterest|redditbot|Applebot|SkypeUriPreview|vkShare) [NC]
+  RewriteCond %{REQUEST_URI} !^/(assets|data|admin|api)/
+  RewriteRule ^([a-z0-9-]+)/?$ og.php?slug=$1 [L,QSA]
+
+  # Všetko ostatné, teda /kinonova a spol., obslúži index.html.
+  RewriteRule ^ index.html [L]
+</IfModule>
+
+# Nastavenie administrácie nesmie byť čitateľné z webu.
+<FilesMatch "^(config|dbconfig)\.php$">
+  Require all denied
+</FilesMatch>
+
+# Zálohy (data/.backups/*.bak), zámok zápisu a iné skryté súbory
+# nepatria na web — obsahujú staršie verzie dát.
+<FilesMatch "^\.|\.(bak|lock)$">
+  Require all denied
+</FilesMatch>
+
+<IfModule mod_headers.c>
+  Header set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  # Stránka sa nikde legitímne nevkladá do <iframe> — zabráni clickjackingu.
+  # Ak hosting (napr. LiteSpeed) tento aj ostatné "Header set" príkazy
+  # ignoruje, CSP nesie aj <meta http-equiv> priamo v HTML.
+  Header always set X-Frame-Options "SAMEORIGIN"
+
+  # Dátové súbory sa menia v administrácii — nesmú ostať v keši.
+  <FilesMatch "\.json$">
+    Header set Cache-Control "no-cache, must-revalidate"
+  </FilesMatch>
+
+  # HTML (index.html, admin/index.html) — bez toho si prehliadač
+  # heuristicky nakešuje shell aj so starým ?v=… a načíta neaktuálny JS.
+  <FilesMatch "\.html$">
+    Header set Cache-Control "no-cache, must-revalidate"
+  </FilesMatch>
+
+  <FilesMatch "\.(css|js|svg|png|woff2)$">
+    Header set Cache-Control "public, max-age=604800, must-revalidate"
+  </FilesMatch>
+
+  # Service worker sa musí kontrolovať pri každom načítaní, inak by
+  # servíroval starú verziu appky donekonečna.
+  <FilesMatch "^sw\.js$">
+    Header set Cache-Control "no-cache, must-revalidate"
+  </FilesMatch>
+</IfModule>
+
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json image/svg+xml
+</IfModule>
+
+AddDefaultCharset UTF-8

@@ -1,0 +1,152 @@
+{
+  "slug": "bruto",
+  "name": "Bruto s.r.o.",
+  "subtitle": "Trnavská cesta 913, Sereď",
+  "mark": {
+    "type": "text",
+    "text": "BR",
+    "image": ""
+  },
+  "theme": {
+    "preset": "mesto",
+    "mode": "auto",
+    "font": "grotesk",
+    "accent": "",
+    "deep": ""
+  },
+  "hours": {
+    "enabled": false,
+    "tz": "Europe/Bratislava",
+    "note": "Otváracie hodiny treba doplniť — nenašli sa verejne overené.",
+    "days": [
+      { "closed": true, "ranges": [] },
+      { "closed": false, "ranges": [["8:00", "16:00"]] },
+      { "closed": false, "ranges": [["8:00", "16:00"]] },
+      { "closed": false, "ranges": [["8:00", "16:00"]] },
+      { "closed": false, "ranges": [["8:00", "16:00"]] },
+      { "closed": false, "ranges": [["8:00", "16:00"]] },
+      { "closed": true, "ranges": [] }
+    ]
+  },
+  "primary": {
+    "enabled": true,
+    "type": "custom",
+    "title": "Objednať servis a kalibráciu",
+    "note": "Bruto s.r.o. · servis váh",
+    "url": "https://bruto.sk/"
+  },
+  "sections": [
+    {
+      "title": "Sledujte nás",
+      "layout": "list",
+      "tiles": [
+        {
+          "type": "facebook",
+          "title": "Facebook — ZvážSiTo",
+          "note": "",
+          "value": "https://www.facebook.com/digitalne.vahy",
+          "icon": "b:facebook",
+          "hidden": false
+        },
+        {
+          "type": "custom",
+          "title": "YouTube",
+          "note": "",
+          "value": "https://www.youtube.com/@zvazsito-digitalnevahy",
+          "icon": "b:youtube",
+          "hidden": false
+        }
+      ]
+    },
+    {
+      "title": "Firma",
+      "layout": "list",
+      "tiles": [
+        {
+          "type": "custom",
+          "title": "Bruto.sk — váhy na mieru",
+          "note": "Výroba, montáž a servis váh od roku 1993",
+          "value": "https://bruto.sk/",
+          "icon": "globe",
+          "hidden": false
+        },
+        {
+          "type": "custom",
+          "title": "ZvážSiTo — e-shop",
+          "note": "Náhradné diely a príslušenstvo k váham",
+          "value": "https://zvazsito.sk/znacka/brutto-s-r-o/",
+          "icon": "external-link",
+          "hidden": false
+        },
+        {
+          "type": "custom",
+          "title": "Digitálne váhy",
+          "note": "",
+          "value": "https://www.digitalne-vahy.sk/",
+          "icon": "external-link",
+          "hidden": false
+        },
+        {
+          "type": "custom",
+          "title": "Automatizované vážiace systémy",
+          "note": "",
+          "value": "https://avs.bruto.sk/",
+          "icon": "settings",
+          "hidden": false
+        }
+      ]
+    },
+    {
+      "title": "Kontakt",
+      "layout": "list",
+      "tiles": [
+        {
+          "type": "navigate",
+          "title": "Navigovať",
+          "note": "Trnavská cesta 913, Sereď",
+          "value": "",
+          "icon": "navigation",
+          "hidden": false
+        },
+        {
+          "type": "phone",
+          "title": "Zavolať — kancelária",
+          "note": "031 789 28 30",
+          "value": "",
+          "icon": "phone",
+          "hidden": false
+        },
+        {
+          "type": "phone",
+          "title": "Zavolať — ZvážSiTo",
+          "note": "0917 862 299",
+          "value": "+421917862299",
+          "icon": "phone",
+          "hidden": false
+        },
+        {
+          "type": "vcard",
+          "title": "Uložiť kontakt",
+          "note": "vCard · 1 klik",
+          "value": "",
+          "icon": "users",
+          "hidden": false
+        }
+      ]
+    }
+  ],
+  "contact": {
+    "phone": "+421317892830",
+    "email": "milos@bruto.sk",
+    "web": "https://bruto.sk",
+    "address": "Trnavská cesta 913, 926 01 Sereď",
+    "org": "Bruto s.r.o. — výrobca váh a vážiacich systémov"
+  },
+  "footer": {
+    "text": "",
+    "showBrand": true
+  },
+  "seo": {
+    "description": "Bruto s.r.o. Sereď — výroba, montáž a servis váh a vážiacich systémov. Kontakt, servis a e-shop ZvážSiTo."
+  }
+}

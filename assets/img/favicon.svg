@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="QR">
+  <rect width="64" height="64" rx="14" fill="#0E3B36"/>
+  <g fill="#E8A317">
+    <path d="M14 14h16v16H14V14zm4 4v8h8v-8h-8z"/>
+    <path d="M34 14h16v16H34V14zm4 4v8h8v-8h-8z"/>
+    <path d="M14 34h16v16H14V34zm4 4v8h8v-8h-8z"/>
+    <rect x="34" y="34" width="6" height="6"/>
+    <rect x="44" y="34" width="6" height="6"/>
+    <rect x="39" y="39" width="6" height="6"/>
+    <rect x="34" y="44" width="6" height="6"/>
+    <rect x="44" y="44" width="6" height="6"/>
+  </g>
+</svg>

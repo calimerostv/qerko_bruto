@@ -1,0 +1,564 @@
+/* ------------------------------------------------------------------
+   admin.css — rozhranie administrácie.
+   Vlastná neutrálna paleta, aby sa nemiešala s témou prevádzky:
+   téma sa uplatňuje iba vnútri náhľadu.
+   ------------------------------------------------------------------ */
+
+:root {
+  --a-bg: #F4F5F7;
+  --a-panel: #FFFFFF;
+  --a-sunk: #F7F8FA;
+  --a-ink: #14181D;
+  --a-muted: #6A737D;
+  --a-line: #E1E5EA;
+  --a-brand: #0E3B36;
+  --a-brand-ink: #EAF2F0;
+  --a-accent: #E8A317;
+  --a-danger: #C0392B;
+  --a-good: #1F7A5C;
+  --a-r: 12px;
+  --a-shadow: 0 1px 2px rgba(16, 24, 32, .05), 0 10px 28px -14px rgba(16, 24, 32, .28);
+  --a-font: "Instrument Sans", system-ui, -apple-system, Segoe UI, sans-serif;
+  --a-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-admin-theme="light"]) {
+    --a-bg: #0E1114;
+    --a-panel: #171B20;
+    --a-sunk: #12161A;
+    --a-ink: #E7EBEF;
+    --a-muted: #93A0AC;
+    --a-line: #262D35;
+    --a-brand: #0E3B36;
+    --a-brand-ink: #EAF2F0;
+    --a-shadow: 0 1px 2px rgba(0, 0, 0, .5), 0 12px 30px -16px rgba(0, 0, 0, .8);
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--a-bg);
+  color: var(--a-ink);
+  font-family: var(--a-font);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 { margin: 0; letter-spacing: -.015em; }
+a { color: inherit; }
+button { font: inherit; }
+
+/* ---------- Horná lišta --------------------------------------------- */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 10px 16px;
+  background: var(--a-brand);
+  color: var(--a-brand-ink);
+}
+.topbar .logo {
+  display: flex; align-items: center; gap: 9px;
+  font-weight: 700; letter-spacing: -.02em;
+}
+.topbar .logo span.badge {
+  width: 26px; height: 26px; border-radius: 8px;
+  background: var(--a-accent); color: #3D2A05;
+  display: grid; place-items: center; font-size: 13px; font-weight: 700;
+}
+.topbar .grow { flex: 1; }
+.topbar select, .topbar button { color: var(--a-ink); }
+.topbar .ghost {
+  background: rgba(255, 255, 255, .12);
+  color: var(--a-brand-ink);
+  border: 1px solid rgba(255, 255, 255, .18);
+}
+.topbar .ghost:hover { background: rgba(255, 255, 255, .2); }
+
+/* ---------- Mriežka ------------------------------------------------- */
+.shell {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 400px;
+  gap: 20px;
+  align-items: start;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 20px 16px 64px;
+}
+@media (max-width: 1080px) {
+  .shell { grid-template-columns: 1fr; }
+  .side { order: -1; }
+}
+
+/* ---------- Karty ---------------------------------------------------- */
+.card {
+  background: var(--a-panel);
+  border: 1px solid var(--a-line);
+  border-radius: var(--a-r);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.card > summary,
+.card-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 16px;
+  cursor: pointer;
+  user-select: none;
+  font-weight: 600;
+  list-style: none;
+}
+.card > summary::-webkit-details-marker { display: none; }
+.card > summary::after {
+  content: "";
+  margin-left: auto;
+  width: 8px; height: 8px;
+  border-right: 2px solid var(--a-muted);
+  border-bottom: 2px solid var(--a-muted);
+  transform: rotate(45deg);
+  transition: transform .15s ease;
+}
+.card[open] > summary::after { transform: rotate(-135deg); }
+.card > summary .n {
+  width: 22px; height: 22px; flex: none;
+  border-radius: 6px;
+  background: var(--a-sunk);
+  border: 1px solid var(--a-line);
+  display: grid; place-items: center;
+  font-size: 11px; color: var(--a-muted);
+}
+.card-body { padding: 4px 16px 18px; border-top: 1px solid var(--a-line); }
+
+/* ---------- Formulárové prvky ---------------------------------------- */
+.field { margin-top: 14px; }
+.field > label,
+.lbl {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--a-muted);
+  margin-bottom: 5px;
+}
+.hint {
+  font-size: 12px;
+  color: var(--a-muted);
+  margin: 5px 0 0;
+}
+.hint code {
+  font-family: var(--a-mono);
+  font-size: 11.5px;
+  background: var(--a-sunk);
+  border: 1px solid var(--a-line);
+  border-radius: 5px;
+  padding: 1px 5px;
+}
+
+input[type=text], input[type=url], input[type=tel], input[type=email],
+input[type=password], input[type=time], select, textarea {
+  width: 100%;
+  padding: 9px 11px;
+  border: 1px solid var(--a-line);
+  border-radius: 9px;
+  background: var(--a-sunk);
+  color: var(--a-ink);
+  font: inherit;
+}
+input:focus, select:focus, textarea:focus {
+  outline: 2px solid var(--a-accent);
+  outline-offset: -1px;
+  background: var(--a-panel);
+}
+textarea { resize: vertical; min-height: 64px; }
+input[type=color] {
+  width: 46px; height: 34px; padding: 2px;
+  border: 1px solid var(--a-line);
+  border-radius: 8px;
+  background: var(--a-sunk);
+}
+
+.row { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
+.row > * { flex: 1; min-width: 0; }
+.row > .fixed { flex: none; }
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  cursor: pointer;
+}
+.check input { width: 16px; height: 16px; accent-color: var(--a-accent); }
+
+/* ---------- Tlačidlá -------------------------------------------------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 13px;
+  border: 1px solid var(--a-line);
+  border-radius: 9px;
+  background: var(--a-panel);
+  color: var(--a-ink);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: background .12s ease, border-color .12s ease;
+}
+.btn:hover { background: var(--a-sunk); border-color: var(--a-muted); }
+.btn svg { width: 15px; height: 15px; }
+.btn.primary {
+  background: var(--a-brand);
+  border-color: var(--a-brand);
+  color: var(--a-brand-ink);
+}
+.btn.primary:hover { filter: brightness(1.15); }
+.btn.accent {
+  background: var(--a-accent);
+  border-color: var(--a-accent);
+  color: #3D2A05;
+}
+.btn.danger { color: var(--a-danger); }
+.btn.danger:hover { background: color-mix(in srgb, var(--a-danger) 10%, transparent); }
+.btn.sm { padding: 5px 9px; font-size: 12px; }
+.btn.icon { padding: 6px; }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+
+.btnrow { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+
+/* ---------- Výber témy ------------------------------------------------ */
+.themes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+  gap: 9px;
+}
+.theme-opt {
+  border: 1px solid var(--a-line);
+  border-radius: 10px;
+  padding: 9px;
+  cursor: pointer;
+  background: var(--a-panel);
+  text-align: left;
+  transition: border-color .12s ease, transform .12s ease;
+}
+.theme-opt:hover { transform: translateY(-1px); }
+.theme-opt.is-on { border-color: var(--a-accent); box-shadow: 0 0 0 2px color-mix(in srgb, var(--a-accent) 30%, transparent); }
+.theme-swatch {
+  height: 34px;
+  border-radius: 7px;
+  display: flex;
+  overflow: hidden;
+  margin-bottom: 7px;
+}
+.theme-swatch i { flex: 1; display: block; }
+.theme-opt b { display: block; font-size: 12.5px; font-weight: 600; }
+.theme-opt em { display: block; font-size: 11px; color: var(--a-muted); font-style: normal; margin-top: 2px; }
+
+/* ---------- Sekcie a dlaždice ----------------------------------------- */
+.sec-card {
+  border: 1px solid var(--a-line);
+  border-radius: 10px;
+  background: var(--a-sunk);
+  padding: 11px;
+  margin-top: 11px;
+}
+.sec-card > .sec-top {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 9px;
+}
+.sec-card > .sec-top input { flex: 1; }
+.sec-card.is-drag { opacity: .5; }
+.sec-card.is-over { border-color: var(--a-accent); box-shadow: 0 0 0 2px color-mix(in srgb, var(--a-accent) 25%, transparent); }
+.sec-handle { cursor: grab; color: var(--a-muted); display: grid; place-items: center; flex: none; }
+.sec-handle svg { width: 15px; height: 15px; }
+
+.tile-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 9px;
+  background: var(--a-panel);
+  border: 1px solid var(--a-line);
+  border-radius: 9px;
+  margin-bottom: 7px;
+}
+.tile-row.is-drag { opacity: .4; }
+.tile-row.is-over { border-color: var(--a-accent); }
+.tile-row .handle {
+  cursor: grab;
+  color: var(--a-muted);
+  display: grid;
+  place-items: center;
+  flex: none;
+}
+.tile-row .handle svg { width: 15px; height: 15px; }
+.tile-row .ic {
+  width: 30px; height: 30px; flex: none;
+  border-radius: 8px;
+  background: var(--a-sunk);
+  border: 1px solid var(--a-line);
+  display: grid; place-items: center;
+}
+.tile-row .ic svg { width: 16px; height: 16px; }
+.tile-row .meta { flex: 1; min-width: 0; }
+.tile-row .meta b { display: block; font-size: 13px; font-weight: 600; }
+.tile-row .meta span {
+  display: block;
+  font-size: 11.5px;
+  color: var(--a-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tile-row.is-hidden { opacity: .5; }
+
+.tile-edit {
+  padding: 11px;
+  margin: -2px 0 8px;
+  border: 1px solid var(--a-line);
+  border-top: 0;
+  border-radius: 0 0 9px 9px;
+  background: var(--a-panel);
+}
+
+/* ---------- Katalóg dlaždíc (výber typu) ------------------------------- */
+.picker { margin-top: 10px; }
+.picker-group {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--a-muted);
+  margin: 11px 0 6px;
+}
+.picker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
+  gap: 6px;
+}
+.picker-grid button {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 9px;
+  border: 1px solid var(--a-line);
+  border-radius: 8px;
+  background: var(--a-panel);
+  cursor: pointer;
+  font-size: 12.5px;
+  text-align: left;
+}
+.picker-grid button:hover { border-color: var(--a-accent); background: var(--a-sunk); }
+.picker-grid svg { width: 15px; height: 15px; flex: none; }
+
+/* ---------- Otváracie hodiny ------------------------------------------ */
+.hgrid { display: grid; gap: 7px; margin-top: 10px; }
+.hline {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 9px;
+  border: 1px solid var(--a-line);
+  border-radius: 9px;
+  background: var(--a-sunk);
+}
+.hline-head { display: flex; align-items: center; gap: 8px; flex: none; width: 150px; }
+.hline-head > .day { font-size: 13px; font-weight: 600; }
+.hranges { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 180px; }
+.hrange { display: flex; align-items: center; gap: 6px; }
+.hline input[type=time] { width: 104px; flex: none; }
+.hline .sep, .season-range .sep { color: var(--a-muted); }
+
+.season-range {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 9px 0;
+  font-size: 12.5px;
+}
+.season-range .lbl { margin: 0; }
+.monthday { display: flex; align-items: center; gap: 5px; }
+.monthday select { width: auto; padding: 6px 8px; }
+
+.exception-fields {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.exception-fields input[type=date] { width: 152px; }
+.exception-fields input[type=time] { width: 96px; }
+.exception-fields input[type=text] { min-width: 160px; }
+
+/* ---------- Bočný panel ------------------------------------------------ */
+.side { position: sticky; top: 68px; }
+
+.phone {
+  border: 1px solid var(--a-line);
+  border-radius: 26px;
+  overflow: hidden;
+  background: var(--a-panel);
+  box-shadow: var(--a-shadow);
+}
+.urlbar {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 13px;
+  background: var(--a-sunk);
+  border-bottom: 1px solid var(--a-line);
+  font-family: var(--a-mono);
+  font-size: 11px;
+  color: var(--a-muted);
+}
+.urlbar b { color: var(--a-ink); font-weight: 600; }
+.urlbar svg { width: 13px; height: 13px; color: var(--a-good); flex: none; }
+.preview-scroll { max-height: 640px; overflow-y: auto; }
+/* Náhľad je izolovaný — téma prevádzky nesmie prefarbiť administráciu. */
+#preview { background: var(--bg, #fff); }
+
+.pv-tabs { display: flex; gap: 6px; margin-bottom: 10px; }
+.pv-tabs button {
+  flex: 1;
+  padding: 6px;
+  border: 1px solid var(--a-line);
+  border-radius: 8px;
+  background: var(--a-panel);
+  cursor: pointer;
+  font-size: 12px;
+}
+.pv-tabs button.is-on {
+  background: var(--a-brand);
+  border-color: var(--a-brand);
+  color: var(--a-brand-ink);
+}
+
+/* ---------- QR panel ---------------------------------------------------- */
+.qrbox {
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: var(--a-sunk);
+  border: 1px solid var(--a-line);
+  border-radius: 10px;
+  margin-top: 10px;
+}
+.qrbox svg { width: 200px; height: 200px; }
+.qr-url {
+  font-family: var(--a-mono);
+  font-size: 11.5px;
+  color: var(--a-muted);
+  word-break: break-all;
+  margin-top: 9px;
+  text-align: center;
+}
+
+/* ---------- Stav a hlásenia --------------------------------------------- */
+.note {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 9px;
+  border: 1px solid var(--a-line);
+  background: var(--a-sunk);
+  font-size: 12.5px;
+}
+.note.ok { border-color: var(--a-good); color: var(--a-good); background: color-mix(in srgb, var(--a-good) 8%, transparent); }
+.note.err { border-color: var(--a-danger); color: var(--a-danger); background: color-mix(in srgb, var(--a-danger) 8%, transparent); }
+.note.busy { opacity: .7; }
+
+.pill {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--a-sunk);
+  border: 1px solid var(--a-line);
+  font-size: 11px;
+  color: var(--a-muted);
+}
+
+.empty {
+  padding: 18px;
+  text-align: center;
+  color: var(--a-muted);
+  font-size: 13px;
+  border: 1px dashed var(--a-line);
+  border-radius: 10px;
+  margin-top: 11px;
+}
+
+/* Logo náhľad */
+.logo-prev {
+  width: 54px; height: 54px;
+  border: 1px solid var(--a-line);
+  border-radius: 10px;
+  background: var(--a-sunk);
+  display: grid; place-items: center;
+  overflow: hidden;
+  flex: none;
+}
+.logo-prev img { max-width: 100%; max-height: 100%; object-fit: contain; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}
+
+/* ---------- Nedokončené dlaždice v náhľade -----------------------------
+   Na verejnej stránke sa dlaždica bez odkazu nezobrazí vôbec. Tu sa
+   ukáže prečiarknuto, aby bolo vidieť, čo ešte treba doplniť.
+   ----------------------------------------------------------------------*/
+#preview .is-empty {
+  border-style: dashed;
+  opacity: .6;
+  box-shadow: none;
+  position: relative;
+}
+#preview .cta.is-empty {
+  background: transparent;
+  color: var(--muted);
+  border: 1px dashed var(--line);
+}
+#preview .is-empty::after {
+  content: "chýba odkaz";
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  font-size: 9.5px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+input[type=range] {
+  accent-color: var(--a-accent);
+  width: 100%;
+}
+
+/* ---------- Kontrola odkazov -------------------------------------------- */
+.link-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 9px;
+  border: 1px solid var(--a-line);
+  border-radius: 8px;
+  background: var(--a-panel);
+  margin-top: 6px;
+  font-size: 12.5px;
+}
+.link-icon { flex: none; display: grid; place-items: center; }
+.link-icon svg { width: 15px; height: 15px; }
+.link-icon.is-ok { color: var(--a-good); }
+.link-icon.is-bad { color: var(--a-danger); }
+.link-icon.is-unknown { color: var(--a-muted); }
+.link-url { overflow-wrap: anywhere; }

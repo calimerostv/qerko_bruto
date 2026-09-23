@@ -1,0 +1,501 @@
+/* ------------------------------------------------------------------
+   site.css — verejný rozcestník. Mobile-first: navrhnuté pre telefón,
+   na väčších obrazovkách je to ten istý stĺpec, len vycentrovaný.
+   Všetky farby prichádzajú z CSS premenných, ktoré nastavuje render.js
+   podľa témy zvolenej v administrácii. Tu nie je ani jedna natvrdo.
+   ------------------------------------------------------------------ */
+
+:root {
+  /* Núdzové hodnoty, kým sa nenačíta téma — zabránia bielemu bliknutiu. */
+  --bg: #EFF1EE; --surface: #FFF; --surface-2: #F7F8F6;
+  --ink: #121A17; --muted: #626E69; --line: #DDE2DE;
+  --accent: #E8A317; --accent-ink: #3D2A05;
+  --deep: #0E3B36; --deep-ink: #EAF2F0; --good: #1F7A5C;
+  --display: system-ui, sans-serif;
+  --body: system-ui, sans-serif;
+  --shadow: 0 1px 2px rgba(14, 20, 18, .06), 0 12px 32px -12px rgba(14, 20, 18, .22);
+  --r: 16px;
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  /* Plocha pod stránkou dostane farbu témy aj pri prepade (iOS bounce). */
+  overscroll-behavior-y: none;
+}
+
+h1, h2, h3 {
+  font-family: var(--display);
+  margin: 0;
+  letter-spacing: -.015em;
+  text-wrap: balance;
+}
+
+a { color: inherit; text-decoration: none; }
+img { max-width: 100%; display: block; }
+
+/* ---------- Rám stránky --------------------------------------------- */
+.page {
+  width: 100%;
+  max-width: 460px;
+  margin: 0 auto;
+  padding: 0 0 32px;
+}
+@media (min-width: 560px) {
+  .page { padding: 28px 0 48px; }
+}
+
+.venue {
+  position: relative;
+  background: var(--surface);
+  overflow: hidden;
+}
+@media (min-width: 560px) {
+  .venue {
+    border: 1px solid var(--line);
+    border-radius: 26px;
+    box-shadow: var(--shadow);
+  }
+}
+
+/* ---------- Hlavička ------------------------------------------------- */
+.hero {
+  background: var(--deep);
+  color: var(--deep-ink);
+  padding: 30px 20px 24px;
+  text-align: center;
+}
+/* Na telefóne siaha hlavička až pod výrez. */
+@media (max-width: 559px) {
+  .hero { padding-top: max(30px, env(safe-area-inset-top)); }
+}
+
+.mark {
+  width: 68px; height: 68px;
+  margin: 0 auto 14px;
+  border-radius: 20px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  display: grid;
+  place-items: center;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 27px;
+  letter-spacing: -.03em;
+  overflow: hidden;
+}
+.mark.is-img { background: transparent; border-radius: 18px; }
+.mark.is-img img { width: 100%; height: 100%; object-fit: contain; }
+
+.hero h2 { font-size: 21px; font-weight: 600; }
+.hero .where { margin: 3px 0 0; font-size: 13.5px; opacity: .74; }
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin: 12px 0 0;
+  padding: 5px 12px 5px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .1);
+  font-size: 12.5px;
+  font-weight: 500;
+}
+.status .dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.status.is-open { color: var(--good); }
+.status.is-closed { color: var(--deep-ink); opacity: .72; }
+.status.is-during { color: var(--good); }
+.status.is-before { color: var(--accent); }
+.status.is-after { color: var(--deep-ink); opacity: .72; }
+.status.is-cancelled { color: #C0392B; background: rgba(192, 57, 43, .12); }
+
+/* ---------- Program podujatia ---------------------------------------- */
+.prog-day + .prog-day { margin-top: 14px; }
+.prog-date {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  margin: 0 2px 7px;
+}
+.prog-row {
+  display: flex;
+  gap: 12px;
+  padding: 9px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--surface-2);
+}
+.prog-row + .prog-row { margin-top: 6px; }
+.prog-time {
+  flex: none;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  font-size: 13px;
+  min-width: 64px;
+}
+.prog-body { display: flex; flex-direction: column; min-width: 0; }
+.prog-title { font-family: var(--display); font-weight: 600; font-size: 14px; overflow-wrap: anywhere; }
+.prog-meta { font-size: 12px; color: var(--muted); overflow-wrap: anywhere; }
+
+/* ---------- Hlavná výzva --------------------------------------------- */
+.cta {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin: 18px 16px 4px;
+  padding: 15px 17px;
+  border-radius: var(--r);
+  background: var(--accent);
+  color: var(--accent-ink);
+  box-shadow: 0 6px 18px -8px color-mix(in srgb, var(--accent) 70%, transparent);
+  transition: transform .12s ease, filter .12s ease;
+}
+.cta:active { transform: scale(.985); filter: brightness(.96); }
+.cta > svg { width: 24px; height: 24px; flex: none; }
+.cta-txt { display: flex; flex-direction: column; min-width: 0; }
+.cta-title { font-family: var(--display); font-weight: 600; font-size: 16px; }
+.cta-note { font-size: 12.5px; opacity: .72; }
+
+/* ---------- Sekcie a dlaždice ---------------------------------------- */
+.sec { padding: 20px 16px 0; }
+
+.sec-title {
+  font-size: 11px;
+  font-family: var(--body);
+  font-weight: 600;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 2px 9px;
+}
+
+.tiles { display: grid; gap: 8px; }
+.tiles.is-grid { grid-template-columns: 1fr 1fr; }
+
+.tile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--surface-2);
+  transition: transform .12s ease, border-color .12s ease;
+  /* Pohodlný cieľ pre palec. */
+  min-height: 56px;
+}
+a.tile:active { transform: scale(.985); border-color: var(--accent); }
+
+.tile.is-grid {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 14px;
+}
+
+.tile-ic {
+  width: 34px; height: 34px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  color: var(--ink);
+}
+.tile-ic svg { width: 18px; height: 18px; }
+
+.tile-body { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.tile-title {
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: 14.5px;
+  overflow-wrap: anywhere;
+}
+.tile-note {
+  font-size: 12.5px;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+.tile-arrow { flex: none; color: var(--muted); opacity: .55; }
+.tile-arrow svg { width: 17px; height: 17px; display: block; }
+
+/* ---------- Fotogaléria priamo na stránke ------------------------------ */
+.tile-photos {
+  grid-column: 1 / -1;   /* aj v dvojstĺpcovej mriežke sa roztiahne cez celú šírku */
+}
+.tile-photos.is-empty {
+  padding: 22px 14px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+  border: 1px dashed var(--line);
+  border-radius: var(--r);
+}
+.photo-strip {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  padding-bottom: 2px;
+  -webkit-overflow-scrolling: touch;
+}
+.photo-strip a {
+  flex: none;
+  width: 128px;
+  height: 96px;
+  border-radius: 12px;
+  overflow: hidden;
+  scroll-snap-align: start;
+  border: 1px solid var(--line);
+}
+.photo-strip img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* ---------- Otváracie hodiny ------------------------------------------ */
+.hours {
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--surface-2);
+  overflow: hidden;
+}
+.hrow {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 14px;
+  font-size: 13.5px;
+}
+.hrow + .hrow { border-top: 1px solid var(--line); }
+.hrow.is-today { background: var(--surface); font-weight: 600; }
+.hday { color: var(--muted); }
+.hrow.is-today .hday { color: var(--ink); }
+.htime { font-variant-numeric: tabular-nums; }
+.htime.is-closed { color: var(--muted); }
+
+.hours-note {
+  margin: 9px 2px 0;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.hours-note.is-active {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* ---------- Päta ------------------------------------------------------ */
+.foot {
+  padding: 26px 20px max(26px, env(safe-area-inset-bottom));
+  text-align: center;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.foot p { margin: 0 0 4px; }
+.foot-dim { opacity: .72; }
+
+.lang-switch {
+  display: inline-flex;
+  gap: 4px;
+  margin-top: 12px;
+  padding: 3px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+}
+.lang-btn {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  padding: 4px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.lang-btn.is-on { background: var(--accent); color: var(--accent-ink); }
+
+/* ---------- Tlačidlo „Pridať na plochu ako appku" -------------------- */
+.pwa-cta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: center;
+  padding: 8px 16px calc(20px + env(safe-area-inset-bottom));
+}
+.pwa-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+}
+.pwa-cta-btn svg { width: 16px; height: 16px; }
+.pwa-cta-btn:active { transform: translateY(1px); }
+.pwa-cta-x {
+  display: inline-flex;
+  padding: 6px;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  border-radius: 999px;
+}
+.pwa-cta-x svg { width: 14px; height: 14px; }
+
+.pwa-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(0, 0, 0, .45);
+  padding: 16px;
+}
+.pwa-sheet-card {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 22px 20px 24px;
+  box-shadow: 0 -8px 40px rgba(0, 0, 0, .25);
+  margin-bottom: max(8px, env(safe-area-inset-bottom));
+}
+.pwa-sheet-card h3 { margin: 0 0 12px; font-size: 16px; }
+.pwa-sheet-card ol { margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.7; }
+.pwa-sheet-ic {
+  display: inline-flex;
+  vertical-align: -4px;
+  color: var(--accent);
+}
+.pwa-sheet-ic svg { width: 16px; height: 16px; }
+.pwa-sheet-note { margin: 14px 0 0; font-size: 12.5px; color: var(--muted); }
+.pwa-sheet-x {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: inline-flex;
+  padding: 8px;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+.pwa-sheet-x svg { width: 16px; height: 16px; }
+
+/* ---------- Rozcestník prevádzok (koreň domény) ----------------------- */
+.dir { padding: 22px 16px 8px; }
+.dir h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+.dir .dek { color: var(--muted); font-size: 14px; margin: 0 0 18px; }
+
+/* ---------- Chybový stav ---------------------------------------------- */
+.oops { padding: 56px 24px; text-align: center; }
+.oops h1 { font-size: 20px; margin-bottom: 8px; }
+.oops p { color: var(--muted); margin: 0 0 18px; }
+.oops code {
+  font-family: ui-monospace, monospace;
+  font-size: 12.5px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 2px 6px;
+}
+
+/* ---------- Bublina --------------------------------------------------- */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(24px + env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  background: var(--ink);
+  color: var(--bg);
+  padding: 9px 16px;
+  border-radius: 999px;
+  font-size: 13px;
+  z-index: 50;
+  transition: opacity .35s ease;
+}
+.toast.is-out { opacity: 0; }
+
+/* ---------- Tlač: QR kód nech sa dá vytlačiť z prehliadača ------------- */
+@media print {
+  body { background: #fff; }
+  .venue { border: 0; box-shadow: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+
+/* Na telefóne karta vyplní celú výšku, aby pod krátkou stránkou
+   nezostával pruh inej farby. */
+@media (max-width: 559px) {
+  .venue { min-height: 100dvh; }
+}
+
+/* ---------- Fotka na pozadí hlavičky -----------------------------------
+   Nad fotkou leží farba témy s nastaviteľným krytím, inak by text na
+   svetlej fotke zmizol. Obsah hlavičky ide nad túto vrstvu.
+   ----------------------------------------------------------------------*/
+.hero { position: relative; }
+
+.hero.has-photo {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.hero.has-photo::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--deep);
+  opacity: calc(var(--hero-dim, 55) / 100);
+}
+.hero.has-photo > * {
+  position: relative;
+  z-index: 1;
+}
+/* Jemný tieň drží nadpis čitateľný aj nad svetlým miestom fotky. */
+.hero.has-photo h2,
+.hero.has-photo .where {
+  text-shadow: 0 1px 12px rgba(0, 0, 0, .45);
+}
+
+/* ---------- Tlačidlo recenzie ------------------------------------------
+   Päť hviezdičiek nad textom, tak ako v pôvodnom návrhu. Sú pozvánkou
+   na napísanie recenzie, nie zobrazením dosiahnutého hodnotenia —
+   preto majú aria-hidden a text nesie celý význam.
+   ----------------------------------------------------------------------*/
+.cta.is-review {
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+  padding: 17px;
+}
+.cta.is-review .cta-txt { align-items: center; }
+
+.cta-stars { display: flex; gap: 4px; }
+.cta-stars svg { width: 19px; height: 19px; display: block; }
